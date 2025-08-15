@@ -1,0 +1,411 @@
+# Korean Bllossom AICA-5B 양자화 프로젝트 설정 파일
+# RTX 4060 8GB 환경 최적화 버전
+
+# ============================================================================
+# 프로젝트 정보
+# ============================================================================
+project:
+  name: "Korean Bllossom AICA-5B Quantized"
+  version: "1.0.0"
+  description: "RTX 4060 8GB 최적화 한국어-영어 시각-언어 모델"
+  author: "Korean Bllossom Team"
+  license: "MIT"
+  created_date: "2024-12-19"
+
+# ============================================================================
+# 모델 설정
+# ============================================================================
+model:
+  # 모델 식별자
+  name: "Bllossom/llama-3.2-Korean-Bllossom-AICA-5B"
+  
+  # 모델 로딩 설정
+  trust_remote_code: true
+  torch_dtype: "bfloat16"  # float16, bfloat16, float32
+  low_cpu_mem_usage: true
+  device_map: "auto"  # auto, cuda, cpu, 또는 사용자 정의 맵핑
+  
+  # 모델 종류 설정
+  model_type: "vision_language"  # text_only, vision_language
+  
+  # 캐시 설정
+  use_cache: true
+  cache_implementation: "static"  # static, dynamic
+  
+  # 어텐션 설정
+  attn_implementation: "flash_attention_2"  # eager, flash_attention_2, sdpa
+
+# ============================================================================
+# 양자화 설정 (RTX 4060 8GB 최적화)
+# ============================================================================
+quantization:
+  # 4비트 양자화 활성화 (메모리 절약)
+  load_in_4bit: true
+  
+  # 양자화 타입
+  bnb_4bit_quant_type: "nf4"  # fp4, nf4
+  
+  # 계산 데이터 타입
+  bnb_4bit_compute_dtype: "bfloat16"  # float16, bfloat16, float32
+  
+  # 더블 양자화 (추가 메모리 절약)
+  bnb_4bit_use_double_quant: true
+  
+  # 양자화 블록 크기
+  bnb_4bit_quant_storage: "uint8"
+  
+  # 8비트 설정 (4비트 대신 사용 가능)
+  load_in_8bit: false
+  
+  # CPU 오프로딩 설정
+  llm_int8_enable_fp32_cpu_offload: false
+  llm_int8_has_fp16_weight: false
+
+# ============================================================================
+# 텍스트 생성 설정
+# ============================================================================
+generation:
+  # 기본 생성 파라미터
+  max_tokens: 256
+  max_new_tokens: 256
+  
+  # 샘플링 설정
+  temperature: 0.7
+  do_sample: true
+  
+  # Nucleus sampling
+  top_p: 0.9
+  
+  # Top-k sampling  
+  top_k: 50
+  
+  # 반복 제어
+  repetition_penalty: 1.1
+  length_penalty: 1.0
+  no_repeat_ngram_size: 3
+  
+  # 빔 서치 설정
+  num_beams: 1
+  early_stopping: false
+  
+  # 특수 토큰 설정
+  pad_token_id: null  # 자동 설정
+  eos_token_id: null  # 자동 설정
+  bos_token_id: null  # 자동 설정
+  
+  # 생성 모드별 설정
+  text_mode:
+    max_tokens: 300
+    temperature: 0.7
+    top_p: 0.9
+    
+  vision_mode:
+    max_tokens: 200
+    temperature: 0.1  # 이미지 분석은 낮은 온도
+    top_p: 0.8
+    
+  creative_mode:
+    max_tokens: 500
+    temperature: 0.9
+    top_p: 0.95
+    
+  precise_mode:
+    max_tokens: 150
+    temperature: 0.1
+    do_sample: false
+
+# ============================================================================
+# 하드웨어 설정 (RTX 4060 8GB 전용)
+# ============================================================================
+hardware:
+  # 타겟 하드웨어
+  target_gpu: "RTX 4060"
+  target_vram_gb: 8
+  
+  # 메모리 관리
+  max_memory_usage: 0.85  # VRAM의 85%까지 사용
+  memory_threshold_warning: 0.8  # 80% 초과시 경고
+  memory_threshold_critical: 0.9  # 90% 초과시 중단
+  
+  # CPU 오프로딩 설정
+  use_cpu_offload: false
+  offload_folder: "./offload_cache"
+  
+  # 배치 처리 설정
+  max_batch_size: 1  # RTX 4060에서는 배치 크기 1 권장
+  gradient_accumulation_steps: 1
+  
+  # CUDA 최적화
+  cuda_memory_fraction: 0.9
+  allow_tf32: true
+  use_deterministic_algorithms: false
+
+# ============================================================================
+# 경로 설정
+# ============================================================================
+paths:
+  # 기본 디렉토리
+  cache_dir: "./model_cache"
+  log_dir: "./logs"
+  output_dir: "./outputs"
+  data_dir: "./data"
+  
+  # 설정 파일
+  config_file: "./config.yaml"
+  
+  # 모델 관련 경로
+  model_cache: "./model_cache/models"
+  tokenizer_cache: "./model_cache/tokenizers"
+  
+  # 임시 파일
+  temp_dir: "./temp"
+  checkpoint_dir: "./checkpoints"
+  
+  # 로그 파일
+  error_log: "./logs/error.log"
+  performance_log: "./logs/performance.log"
+  generation_log: "./logs/generation.log"
+
+# ============================================================================
+# 로깅 설정
+# ============================================================================
+logging:
+  # 로그 레벨
+  level: "INFO"  # DEBUG, INFO, WARNING, ERROR, CRITICAL
+  
+  # 로그 포맷
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  date_format: "%Y-%m-%d %H:%M:%S"
+  
+  # 파일 로깅
+  file_logging: true
+  max_file_size: "10MB"
+  backup_count: 5
+  
+  # 콘솔 로깅
+  console_logging: true
+  console_level: "INFO"
+  
+  # 성능 로깅
+  performance_logging: true
+  log_generation_stats: true
+  log_memory_usage: true
+
+# ============================================================================
+# 보안 및 개인정보 설정
+# ============================================================================
+security:
+  # 텔레메트리 설정
+  disable_telemetry: true
+  
+  # 캐시 암호화
+  encrypt_cache: false
+  
+  # 개인정보 보호
+  anonymize_logs: true
+  log_user_inputs: false
+  
+  # 네트워크 보안
+  verify_ssl: true
+  use_proxy: false
+  proxy_url: null
+
+# ============================================================================
+# 네트워크 설정
+# ============================================================================
+network:
+  # 다운로드 설정
+  download_timeout: 300  # 5분
+  max_retries: 3
+  retry_delay: 5
+  
+  # 연결 설정
+  connection_timeout: 30
+  read_timeout: 60
+  
+  # 대역폭 제한
+  max_download_speed: null  # 무제한
+  
+  # 미러 설정
+  use_mirror: false
+  mirror_url: "https://hf-mirror.com"
+
+# ============================================================================
+# 시각-언어 모델 설정
+# ============================================================================
+vision:
+  # 이미지 전처리
+  max_image_size: 1024
+  image_format: "RGB"
+  preprocessing: true
+  
+  # 지원 형식
+  supported_formats: ["JPEG", "PNG", "WebP", "BMP"]
+  
+  # 이미지 리사이징
+  resize_method: "lanczos"  # nearest, bilinear, bicubic, lanczos
+  maintain_aspect_ratio: true
+  
+  # 메모리 최적화
+  process_images_sequentially: true
+  clear_image_cache: true
+
+# ============================================================================
+# API 서버 설정 (향후 사용)
+# ============================================================================
+api:
+  # 서버 설정
+  host: "0.0.0.0"
+  port: 8000
+  
+  # 보안 설정
+  enable_cors: true
+  cors_origins: ["*"]
+  
+  # 요청 제한
+  max_request_size: "10MB"
+  rate_limit: "100/hour"
+  
+  # 인증 설정
+  enable_auth: false
+  api_key: null
+
+# ============================================================================
+# 웹 인터페이스 설정 (Gradio)
+# ============================================================================
+web:
+  # 서버 설정
+  port: 7860
+  share: false
+  
+  # 테마 설정
+  theme: "default"
+  title: "Korean Bllossom AICA-5B"
+  
+  # 인터페이스 설정
+  max_file_size: "10MB"
+  enable_queue: true
+  
+  # 예시 설정
+  examples_enabled: true
+  default_examples:
+    - "안녕하세요! 인공지능에 대해 설명해주세요."
+    - "한국의 전통문화에 대해 알려주세요."
+    - "파이썬 프로그래밍의 장점은 무엇인가요?"
+
+# ============================================================================
+# 실험적 기능 설정
+# ============================================================================
+experimental:
+  # 새로운 기능 활성화
+  enable_experimental_features: false
+  
+  # 스트리밍 응답
+  enable_streaming: false
+  
+  # 분산 추론
+  enable_distributed: false
+  
+  # 플러그인 시스템
+  enable_plugins: false
+  plugin_dir: "./plugins"
+
+# ============================================================================
+# 성능 모니터링 설정
+# ============================================================================
+monitoring:
+  # 성능 추적
+  enable_performance_tracking: true
+  
+  # 메트릭 수집
+  collect_metrics: true
+  metrics_interval: 60  # 초
+  
+  # 자동 최적화
+  auto_optimization: false
+  
+  # 벤치마크
+  run_startup_benchmark: true
+  benchmark_iterations: 3
+
+# ============================================================================
+# 개발자 설정
+# ============================================================================
+development:
+  # 디버그 모드
+  debug_mode: false
+  verbose_logging: false
+  
+  # 프로파일링
+  enable_profiling: false
+  profile_output: "./profiles"
+  
+  # 테스트 설정
+  test_mode: false
+  mock_model: false
+  
+  # 개발 도구
+  enable_hot_reload: false
+  auto_save_config: true
+
+# ============================================================================
+# 환경별 설정 오버라이드
+# ============================================================================
+environments:
+  # 개발 환경
+  development:
+    logging:
+      level: "DEBUG"
+    generation:
+      max_tokens: 100
+    hardware:
+      max_memory_usage: 0.7
+  
+  # 프로덕션 환경  
+  production:
+    logging:
+      level: "ERROR"
+    security:
+      anonymize_logs: true
+    monitoring:
+      collect_metrics: true
+  
+  # 테스트 환경
+  testing:
+    development:
+      test_mode: true
+      mock_model: true
+    generation:
+      max_tokens: 50
+
+# ============================================================================
+# 사용자 정의 설정 (고급 사용자용)
+# ============================================================================
+custom:
+  # 사용자 정의 파라미터
+  user_defined_params: {}
+  
+  # 커스텀 프롬프트 템플릿
+  prompt_templates:
+    korean_formal: "다음 질문에 대해 정중하고 정확하게 답변해주세요:\n{prompt}\n\n답변:"
+    korean_casual: "안녕! 다음에 대해 알려줄래?\n{prompt}"
+    english_formal: "Please provide a detailed answer to the following question:\n{prompt}\n\nAnswer:"
+    
+  # 시스템 메시지 프리셋
+  system_messages:
+    assistant: "당신은 친근하고 도움이 되는 AI 어시스턴트입니다."
+    expert: "당신은 해당 분야의 전문가로서 정확하고 상세한 정보를 제공합니다."
+    teacher: "당신은 이해하기 쉽게 설명하는 친근한 선생님입니다."
+    translator: "당신은 정확하고 자연스러운 번역을 제공하는 전문 번역가입니다."
+
+# ============================================================================
+# 설정 메타데이터
+# ============================================================================
+metadata:
+  config_version: "1.0.0"
+  last_modified: "2024-12-19"
+  compatible_python_versions: ["3.8", "3.9", "3.10", "3.11"]
+  recommended_python_version: "3.10.12"
+  target_hardware: "RTX 4060 8GB"
+  estimated_vram_usage: "5-7GB"
+  estimated_ram_usage: "8-16GB"
