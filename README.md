@@ -48,10 +48,6 @@ df -h
 ### 2. 프로젝트 설치
 
 ```bash
-# 프로젝트 클론
-git clone <repository-url>
-cd korean-bllossom-quantized
-
 # 자동 설치 실행
 chmod +x setup.sh
 ./setup.sh
@@ -444,3 +440,4 @@ flake8 .
 # 테스트 실행
 pytest tests/
 ```
+---
