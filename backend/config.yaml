@@ -145,17 +145,18 @@ hardware:
 # ============================================================================
 paths:
   # 기본 디렉토리
-  cache_dir: "./model_cache"
+  # cache_dir: null 이면 Hugging Face 기본 경로(~/.cache/huggingface/hub) 사용
+  cache_dir: null
   log_dir: "./logs"
   output_dir: "./outputs"
   data_dir: "./data"
-  
+
   # 설정 파일
   config_file: "./config.yaml"
-  
-  # 모델 관련 경로
-  model_cache: "./model_cache/models"
-  tokenizer_cache: "./model_cache/tokenizers"
+
+  # 모델 관련 경로 (HF 기본 캐시 사용)
+  model_cache: null
+  tokenizer_cache: null
   
   # 임시 파일
   temp_dir: "./temp"

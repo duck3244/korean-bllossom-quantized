@@ -273,7 +273,7 @@ def show_config():
         config.print_config()
 
         print(f"\n📁 경로 설정:")
-        print(f"   캐시 디렉토리: {config.paths.cache_dir}")
+        print(f"   캐시 디렉토리: {config.paths.cache_dir or 'Hugging Face 기본 (~/.cache/huggingface/hub)'}")
         print(f"   로그 디렉토리: {config.paths.log_dir}")
         print(f"   출력 디렉토리: {config.paths.output_dir}")
     except Exception as e:

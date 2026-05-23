@@ -44,7 +44,7 @@ class HardwareConfig:
 @dataclass
 class PathConfig:
     """경로 설정"""
-    cache_dir: str = "./model_cache"
+    cache_dir: Optional[str] = None  # None이면 Hugging Face 기본 경로(~/.cache/huggingface/hub) 사용
     log_dir: str = "./logs"
     output_dir: str = "./outputs"
     config_file: str = "./config.yaml"
@@ -153,12 +153,14 @@ class Config:
     def _create_directories(self):
         """필요한 디렉토리 생성"""
         directories = [
-            self.paths.cache_dir,
+            self.paths.cache_dir,  # None이면 HF 기본 경로를 사용하므로 생성하지 않음
             self.paths.log_dir,
             self.paths.output_dir
         ]
-        
+
         for directory in directories:
+            if not directory:
+                continue
             try:
                 os.makedirs(directory, exist_ok=True)
             except Exception as e:
@@ -178,13 +180,11 @@ class Config:
 # 환경 변수 설정
 def setup_environment():
     """환경 변수 설정"""
-    # Hugging Face 캐시 디렉토리
-    os.environ['HF_HOME'] = './model_cache'
-    os.environ['TRANSFORMERS_CACHE'] = './model_cache'
-    
+    # Hugging Face 캐시 경로는 HF 기본값(~/.cache/huggingface)을 그대로 사용합니다.
+
     # CUDA 설정 (메모리 최적화)
     os.environ['PYTORCH_CUDA_ALLOC_CONF'] = 'max_split_size_mb:512'
-    
+
     # 경고 메시지 숨기기
     os.environ['TOKENIZERS_PARALLELISM'] = 'false'
 

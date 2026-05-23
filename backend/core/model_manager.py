@@ -93,15 +93,15 @@ class ModelManager:
                 torch_dtype=getattr(torch, self.config.model.torch_dtype),
                 low_cpu_mem_usage=self.config.model.low_cpu_mem_usage,
                 trust_remote_code=self.config.model.trust_remote_code,
-                cache_dir=self.config.paths.cache_dir
+                cache_dir=self.config.paths.cache_dir  # None이면 HF 기본 캐시(~/.cache/huggingface) 사용
             )
-            
+
             # 프로세서 로드
             print("🔧 프로세서 로딩 중...")
             self.processor = MllamaProcessor.from_pretrained(
                 self.config.model.name,
                 trust_remote_code=self.config.model.trust_remote_code,
-                cache_dir=self.config.paths.cache_dir
+                cache_dir=self.config.paths.cache_dir  # None이면 HF 기본 캐시 사용
             )
             
             self.is_loaded = True
